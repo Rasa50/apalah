@@ -43,7 +43,7 @@ public class BenefitDAO {
     }
 
     public void upsertUser(String user) {
-        String sql = "INSERT OR IGNORE INTO tbenefit(username) VALUES(?)";
+        String sql = "INSERT IGNORE INTO tbenefit(username) VALUES(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user);

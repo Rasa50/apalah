@@ -32,10 +32,16 @@ public class GamePresenter {
         if (view.getKeyHandler().down) player.move(0, 5);
         if (view.getKeyHandler().left) player.move(-5, 0);
         if (view.getKeyHandler().right) player.move(5, 0);
-        if (view.getKeyHandler().pause) view.backToMenu();
+        if (view.getKeyHandler().pause) {
+            bullets.add(new Bullet(player.getX() + 17, player.getY()));
+        }
+        if (view.getKeyHandler().pause && ammo > 0) {
+            bullets.add(new Bullet(player.getX() + 17, player.getY()));
+            ammo--; // Kurangi amunisi setiap menembak
+        }
 
         // Logic Spawn Alien sederhana
-        if (Math.random() < 0.02) aliens.add(new Alien((int)(Math.random()*750), 600));
+        if (Math.random() < 0.02) aliens.add(new Alien((int)(Math.random()*750), 0));
 
         for (int i = 0; i < aliens.size(); i++) {
             Alien a = aliens.get(i);
