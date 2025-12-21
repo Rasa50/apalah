@@ -13,12 +13,26 @@ public class GameView extends JPanel {
 
     public GameView(MainFrame frame) {
         this.frame = frame;
-        setFocusable(true);
-        setBackground(new Color(10, 10, 40)); // Biru gelap luar angkasa
+
+        // --- PERBAIKAN FOCUS ---
+        setFocusable(true); // Memungkinkan panel menerima fokus
+        setFocusTraversalKeysEnabled(false); // Opsional: Agar tombol Tab tidak memindahkan fokus
+
+        setBackground(new Color(10, 10, 40));
         keyHandler = new KeyHandler();
         addKeyListener(keyHandler);
 
         presenter = new GamePresenter(this);
+
+        // Memastikan panel meminta fokus saat dibuat
+        SwingUtilities.invokeLater(() -> requestFocusInWindow());
+    }
+
+    // Tambahkan method ini agar setiap kali view ditampilkan, fokus otomatis diminta
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        requestFocus(); // Meminta fokus segera saat panel muncul di layar
     }
 
     @Override
@@ -33,37 +47,29 @@ public class GameView extends JPanel {
     }
 
     private void drawGame(Graphics2D g) {
-        // 1. Draw Player
         Player p = presenter.getPlayer();
         g.setColor(Color.CYAN);
         g.fillRoundRect(p.getX(), p.getY(), p.getWidth(), p.getHeight(), 10, 10);
 
-        // 2. Draw Aliens
         g.setColor(Color.MAGENTA);
         for (Alien a : presenter.getAliens()) {
             g.fillOval(a.getX(), a.getY(), 30, 30);
-            // Tambahkan "mata" agar alien terlihat lebih hidup
             g.setColor(Color.WHITE);
             g.fillOval(a.getX()+5, a.getY()+10, 5, 5);
             g.fillOval(a.getX()+20, a.getY()+10, 5, 5);
             g.setColor(Color.MAGENTA);
         }
 
-        // 3. Draw Player Bullets (Warna Kuning)
         g.setColor(Color.YELLOW);
         for (Bullet b : presenter.getPlayerBullets()) {
             g.fillRect(b.getX(), b.getY(), 5, 12);
         }
 
-        // 4. Draw Enemy Bullets (Warna Merah/Oranye - Efek Animasi)
         g.setColor(Color.ORANGE);
         for (Bullet b : presenter.getEnemyBullets()) {
-            // Karena peluru musuh turun, kita gambar dengan arah terbalik
-            // Kita asumsikan update peluru musuh ditangani di presenter
             g.fillOval(b.getX(), b.getY(), 8, 8);
         }
 
-        // 5. Draw UI (HUD)
         g.setColor(Color.WHITE);
         g.setFont(new Font("Consolas", Font.BOLD, 16));
         g.drawString("SCORE: " + presenter.getScore(), 20, 30);
@@ -75,7 +81,7 @@ public class GameView extends JPanel {
     }
 
     private void drawGameOverScreen(Graphics2D g) {
-        g.setColor(new Color(0, 0, 0, 150)); // Overlay transparan
+        g.setColor(new Color(0, 0, 0, 150));
         g.fillRect(0, 0, getWidth(), getHeight());
 
         g.setColor(Color.RED);

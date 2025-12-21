@@ -13,7 +13,7 @@ public class GamePresenter {
     private List<Alien> aliens;
     private List<Bullet> playerBullets = new ArrayList<>();
     private List<Bullet> enemyBullets = new ArrayList<>();
-    private GameLoop gameLoop; // DEKLARASI INI WAJIB ADA
+    private GameLoop gameLoop;
     private int score = 0;
     private int ammo = 100;
     private boolean gameOver = false;
@@ -21,10 +21,8 @@ public class GamePresenter {
 
     public GamePresenter(GameView view) {
         this.view = view;
-        this.player = new Player(380, 500);
+        this.player = new Player(380, 500); // Player di bawah
         this.aliens = new ArrayList<>();
-
-        // Inisialisasi dan jalankan Thread agar game bergerak
         this.gameLoop = new GameLoop(this);
         new Thread(this.gameLoop).start();
     }
@@ -34,11 +32,10 @@ public class GamePresenter {
 
         handleInput();
 
-        // Spawn Alien dari atas (y = -30)
-        if (Math.random() < 0.02) {
-            aliens.add(new Alien((int)(Math.random() * 750), -30));
-        }
+        // 1. Spawn Alien dari atas
+        if (Math.random() < 0.02) aliens.add(new Alien((int)(Math.random()*750), -30));
 
+        // 2. Jalankan logika Update (Hanya panggil method pembantu agar rapi)
         updateAliens();
         updatePlayerBullets();
         updateEnemyBullets();
@@ -53,7 +50,7 @@ public class GamePresenter {
         if (view.getKeyHandler().right) player.move(5, 0);
 
         long currentTime = System.currentTimeMillis();
-        // Menembak dengan jeda 200ms agar tidak bertumpuk
+        // Menembak dengan jeda 200ms
         if (view.getKeyHandler().pause && ammo > 0 && currentTime - lastShotTime > 200) {
             playerBullets.add(new Bullet(player.getX() + 17, player.getY(), 10, false));
             ammo--;
@@ -65,8 +62,10 @@ public class GamePresenter {
         Iterator<Alien> it = aliens.iterator();
         while (it.hasNext()) {
             Alien a = it.next();
-            a.update(enemyBullets); // Kirim list peluru agar alien bisa menembak
+            // Panggil update dengan parameter agar alien bisa nembak
+            a.update(enemyBullets);
 
+            // Cek tabrakan fisik player vs alien
             if (player.getBounds().intersects(a.getBounds())) {
                 endGame();
             }
@@ -98,6 +97,7 @@ public class GamePresenter {
             Bullet b = it.next();
             b.update();
 
+            // Cek jika player kena peluru musuh
             if (b.getBounds().intersects(player.getBounds())) {
                 endGame();
             }
@@ -107,11 +107,13 @@ public class GamePresenter {
     }
 
     private void endGame() {
-        gameOver = true;
-        new BenefitDAO().updateScore("Rex ID", score, 0, ammo);
+        if (!gameOver) {
+            gameOver = true;
+            new BenefitDAO().updateScore("Rex ID", score, 0, ammo);
+        }
     }
 
-    // Getters untuk keperluan render di GameView
+    // Getters untuk render di GameView
     public Player getPlayer() { return player; }
     public List<Alien> getAliens() { return aliens; }
     public List<Bullet> getPlayerBullets() { return playerBullets; }
