@@ -28,7 +28,12 @@ public class GamePresenter {
     }
 
     public void update() {
-        if (gameOver) return;
+        if (gameOver && view.getKeyHandler().esc) {
+            view.backToMenu();
+            return;
+        }
+
+        if (gameOver) return; // Hentikan update jika masih game over
 
         handleInput();
 
@@ -92,18 +97,29 @@ public class GamePresenter {
     }
 
     private void updateEnemyBullets() {
-        Iterator<Bullet> it = enemyBullets.iterator();
-        while (it.hasNext()) {
-            Bullet b = it.next();
-            b.update();
+        // Asumsikan kamu punya list enemyBullets di Presenter
+        for (int i = enemyBullets.size() - 1; i >= 0; i--) {
+            Bullet b = enemyBullets.get(i);
+            b.update(); // Pastikan peluru musuh bergerak turun (y += speed)
 
-            // Cek jika player kena peluru musuh
+            // CEK TABRAKAN: Jika peluru musuh mengenai Player
             if (b.getBounds().intersects(player.getBounds())) {
-                endGame();
+                gameOver = true;
+                endGame(); // Pastikan method ini memanggil endGame logic
             }
 
-            if (!b.isActive()) it.remove();
+            if (!b.isActive()) enemyBullets.remove(i);
         }
+    }
+
+    public void resetGame() {
+        this.score = 0;
+        this.ammo = 100;
+        this.gameOver = false;
+        this.player = new Player(380, 500); // Reset posisi player
+        this.aliens.clear(); // Bersihkan sisa alien
+        this.playerBullets.clear(); // Bersihkan peluru
+        this.enemyBullets.clear(); // Bersihkan peluru musuh
     }
 
     private void endGame() {

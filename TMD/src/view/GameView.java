@@ -14,25 +14,22 @@ public class GameView extends JPanel {
     public GameView(MainFrame frame) {
         this.frame = frame;
 
-        // --- PERBAIKAN FOCUS ---
-        setFocusable(true); // Memungkinkan panel menerima fokus
-        setFocusTraversalKeysEnabled(false); // Opsional: Agar tombol Tab tidak memindahkan fokus
+        setFocusable(true);
+        setFocusTraversalKeysEnabled(false);
 
         setBackground(new Color(10, 10, 40));
         keyHandler = new KeyHandler();
         addKeyListener(keyHandler);
 
         presenter = new GamePresenter(this);
-
-        // Memastikan panel meminta fokus saat dibuat
-        SwingUtilities.invokeLater(() -> requestFocusInWindow());
+        // Hapus baris 'this.addNotify();' yang ada di sini sebelumnya
     }
 
-    // Tambahkan method ini agar setiap kali view ditampilkan, fokus otomatis diminta
     @Override
     public void addNotify() {
         super.addNotify();
-        requestFocus(); // Meminta fokus segera saat panel muncul di layar
+        // Meminta fokus segera setelah panel aktif di layar
+        requestFocusInWindow();
     }
 
     @Override
@@ -96,6 +93,15 @@ public class GameView extends JPanel {
         g.drawString("Press ESC to Back to Menu", x + 50, 350);
     }
 
-    public void backToMenu() { frame.showView("MENU"); }
+    public void backToMenu() {
+        presenter.resetGame(); // Reset semua status game
+        frame.showView("MENU");
+    }
+
+    public void resetGameSesi() {
+        // Memanggil method resetGame sesuai yang ada di presenter
+        presenter.resetGame();
+    }
+
     public KeyHandler getKeyHandler() { return keyHandler; }
 }
