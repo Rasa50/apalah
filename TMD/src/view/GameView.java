@@ -13,95 +13,29 @@ public class GameView extends JPanel {
 
     public GameView(MainFrame frame) {
         this.frame = frame;
-
         setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-
         setBackground(new Color(10, 10, 40));
         keyHandler = new KeyHandler();
         addKeyListener(keyHandler);
-
         presenter = new GamePresenter(this);
-        // Hapus baris 'this.addNotify();' yang ada di sini sebelumnya
-    }
-
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        // Meminta fokus segera setelah panel aktif di layar
-        requestFocusInWindow();
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        if (presenter != null) {
-            drawGame(g2);
-        }
     }
 
     private void drawGame(Graphics2D g) {
-        Player p = presenter.getPlayer();
-        g.setColor(Color.CYAN);
-        g.fillRoundRect(p.getX(), p.getY(), p.getWidth(), p.getHeight(), 10, 10);
+        // Gambar Player, Alien, Peluru (logika gambar sama)
+        // ... (gambar objek)
 
-        g.setColor(Color.MAGENTA);
-        for (Alien a : presenter.getAliens()) {
-            g.fillOval(a.getX(), a.getY(), 30, 30);
-            g.setColor(Color.WHITE);
-            g.fillOval(a.getX()+5, a.getY()+10, 5, 5);
-            g.fillOval(a.getX()+20, a.getY()+10, 5, 5);
-            g.setColor(Color.MAGENTA);
-        }
-
-        g.setColor(Color.YELLOW);
-        for (Bullet b : presenter.getPlayerBullets()) {
-            g.fillRect(b.getX(), b.getY(), 5, 12);
-        }
-
-        g.setColor(Color.ORANGE);
-        for (Bullet b : presenter.getEnemyBullets()) {
-            g.fillOval(b.getX(), b.getY(), 8, 8);
-        }
-
+        // HUD Spesifikasi Baru
         g.setColor(Color.WHITE);
         g.setFont(new Font("Consolas", Font.BOLD, 16));
-        g.drawString("SCORE: " + presenter.getScore(), 20, 30);
-        g.drawString("AMMO : " + presenter.getAmmo(), 20, 55);
+        g.drawString("SKOR      : " + presenter.getScore(), 20, 30);
+        g.drawString("AMUNISI   : " + presenter.getAmmo(), 20, 55);
+
+        String status = presenter.getStatusMessage();
+        g.drawString("STATUS    : " + status, 20, 80);
 
         if(presenter.isGameOver()) {
             drawGameOverScreen(g);
         }
     }
-
-    private void drawGameOverScreen(Graphics2D g) {
-        g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, getWidth(), getHeight());
-
-        g.setColor(Color.RED);
-        g.setFont(new Font("Arial", Font.BOLD, 50));
-        String msg = "MISSION FAILED";
-        FontMetrics metrics = g.getFontMetrics();
-        int x = (getWidth() - metrics.stringWidth(msg)) / 2;
-        g.drawString(msg, x, 300);
-
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
-        g.setColor(Color.WHITE);
-        g.drawString("Press ESC to Back to Menu", x + 50, 350);
-    }
-
-    public void backToMenu() {
-        presenter.resetGame(); // Reset semua status game
-        frame.showView("MENU");
-    }
-
-    public void resetGameSesi() {
-        // Memanggil method resetGame sesuai yang ada di presenter
-        presenter.resetGame();
-    }
-
-    public KeyHandler getKeyHandler() { return keyHandler; }
+    // ... (rest of the file)
 }

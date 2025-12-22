@@ -5,27 +5,20 @@ import java.awt.Rectangle;
 public class Bullet {
     private int x, y;
     private int speed;
-    private int width = 5, height = 10;
+    private int width = 8, height = 8; // Peluru alien dibuat bulat kecil
     private boolean active = true;
-    private boolean isEnemyBullet; // Flag untuk membedakan peluru
+    private boolean isEnemy;
 
-    // Constructor dengan 4 parameter
-    public Bullet(int x, int y, int speed, boolean isEnemyBullet) {
+    public Bullet(int x, int y, int speed, boolean isEnemy) {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        this.isEnemyBullet = isEnemyBullet;
+        this.isEnemy = isEnemy;
     }
 
     public void update() {
-        if (isEnemyBullet) {
-            y += speed; // Peluru musuh turun ke bawah
-        } else {
-            y -= speed; // Peluru pemain naik ke atas
-        }
-
-        // Nonaktif jika keluar layar
-        if (y < 0 || y > 600) active = false;
+        y += speed; // Selalu turun karena hanya alien yang menembak
+        if (y > 600) active = false;
     }
 
     public Rectangle getBounds() {

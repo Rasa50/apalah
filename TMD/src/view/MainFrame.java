@@ -34,16 +34,10 @@ public class MainFrame extends JFrame {
      */
     public void showView(String name) {
         cardLayout.show(mainPanel, name);
-
-        // Jika pindah ke layar GAME, lakukan persiapan sesi baru
         if (name.equals("GAME")) {
-            // 1. Reset data game (skor, posisi, gameOver status) agar bisa main lagi dari nol
-            gameView.resetGameSesi();
-
-            // 2. Paksa fokus ke GameView agar KeyListener (WASD/ESC) langsung aktif
+            gameView.resetGameSesi(); // Memanggil resetGame di presenter
             gameView.requestFocusInWindow();
         }
-
         mainPanel.revalidate();
         mainPanel.repaint();
     }
