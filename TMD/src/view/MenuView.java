@@ -25,7 +25,7 @@ public class MenuView extends JPanel {
         pnlInput.add(txtUsername);
         pnlInput.add(btnPlay);
 
-        // Table Score
+        // Table Score - Inisialisasi model dengan kolom yang sesuai spesifikasi
         tableModel = new DefaultTableModel(new String[]{"User", "Skor", "Meleset", "Sisa Peluru"}, 0);
         tableScores = new JTable(tableModel);
 
@@ -39,7 +39,36 @@ public class MenuView extends JPanel {
         presenter.loadData();
     }
 
-    public String getUsername() { return txtUsername.getText(); }
-    public void setTableModel(DefaultTableModel model) { tableScores.setModel(model); }
-    public void startGame() { frame.showView("GAME"); }
+    // Mengambil referensi MainFrame untuk koordinasi antar layar
+    public MainFrame getMainFrame() {
+        return frame;
+    }
+
+    public String getUsername() {
+        return txtUsername.getText();
+    }
+
+    // Method aman untuk memperbarui data tabel tanpa merusak header kolom
+    public void updateTableData(DefaultTableModel newModel) {
+        tableModel.setRowCount(0); // Hapus data lama
+        for (int i = 0; i < newModel.getRowCount(); i++) {
+            Object[] row = new Object[newModel.getColumnCount()];
+            for (int j = 0; j < newModel.getColumnCount(); j++) {
+                row[j] = newModel.getValueAt(i, j);
+            }
+            tableModel.addRow(row); // Tambah data baru
+        }
+    }
+
+    public void setTableModel(DefaultTableModel model) {
+        tableScores.setModel(model);
+    }
+
+    public void startGame() {
+        frame.showView("GAME");
+    }
+
+    public MenuPresenter getPresenter() {
+        return presenter;
+    }
 }

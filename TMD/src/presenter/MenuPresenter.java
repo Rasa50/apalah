@@ -27,6 +27,8 @@ public class MenuPresenter {
     public void onPlayClicked() {
         String user = view.getUsername();
         if (!user.isEmpty()) {
+            // Beritahu Frame nama siapa yang bermain
+            view.getMainFrame().setPlayerName(user);
             dao.upsertUser(user);
             view.startGame();
         }
