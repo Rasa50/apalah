@@ -3,83 +3,117 @@ package presenter;
 import view.GameView;
 import model.*;
 import util.GameLoop;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 public class GamePresenter {
     private GameView view;
     private Player player;
     private List<Alien> aliens;
+    private List<Rock> rocks;
     private List<Bullet> playerBullets = new ArrayList<>();
     private List<Bullet> enemyBullets = new ArrayList<>();
-
-    private int score = 0;
-    private int missedBullets = 0; // Peluru alien yang meleset
-    private int ammo = 0;          // Awalnya tidak punya peluru
+    private int score, missedBullets, ammo;
     private boolean gameOver = false;
+    private boolean victory = false;
     private String currentUsername;
+    private GameLoop loop;
 
     public enum GamePhase { HIDING, PLAYER_TURN }
     private GamePhase currentPhase = GamePhase.HIDING;
-    private long phaseStartTime;
-    private final int HIDE_TIME = 3000; // 3 detik persembunyian
-    private Random rand = new Random();
 
     public GamePresenter(GameView view, String username) {
         this.view = view;
         this.currentUsername = username;
-        this.player = new Player(380, 500);
-        this.aliens = new ArrayList<>();
-        this.aliens.add(new Alien(380, 50));
+        BenefitDAO dao = new BenefitDAO();
+        Benefit dataLama = dao.getUserData(username);
 
-        new BenefitDAO().upsertUser(this.currentUsername);
-        this.phaseStartTime = System.currentTimeMillis();
-        new Thread(new GameLoop(this)).start();
+        if (dataLama != null) {
+            this.score = dataLama.getSkor();
+            this.ammo = dataLama.getPeluruAkhir();
+            this.missedBullets = dataLama.getPeluruMeleset();
+        } else {
+            dao.upsertUser(username);
+            this.score = 0; this.ammo = 0; this.missedBullets = 0;
+        }
+
+        this.player = new Player(380, 500);
+        this.rocks = Arrays.asList(new Rock(400, 300));
+        this.aliens = new ArrayList<>(Arrays.asList(
+                new Alien(100, 50),
+                new Alien(400, 50),
+                new Alien(700, 50)
+        ));
+
+        this.loop = new GameLoop(this);
+        new Thread(this.loop).start();
     }
 
     public void update() {
-        if (gameOver && view.getKeyHandler().esc) {
-            view.backToMenu();
+        // Jika status game berakhir, hanya deteksi ESC untuk kembali ke menu
+        if (gameOver || victory) {
+            if (view.getKeyHandler().esc) view.backToMenu();
             return;
         }
-        if (gameOver) return;
 
-        handleInput(); // Proses masukan keyboard
+        handleInput();
 
-        if (currentPhase == GamePhase.HIDING) {
-            // Alien menembak secara acak agar player mencari posisi
-            if (Math.random() < 0.05) {
-                enemyBullets.add(new Bullet(rand.nextInt(750), 0, 5, true));
-            }
-            updateEnemyBullets();
+        // Gerakkan semua alien (Patroli kanan-kiri)
+        for (Alien a : aliens) {
+            a.update();
+        }
 
-            if (System.currentTimeMillis() - phaseStartTime > HIDE_TIME) {
-                currentPhase = GamePhase.PLAYER_TURN;
-            }
-        } else {
-            updatePlayerBullets();
-            // Jika peluru habis, kembali sembunyi untuk kumpulkan peluru lagi
-            if (playerBullets.isEmpty() && ammo == 0) {
-                currentPhase = GamePhase.HIDING;
-                phaseStartTime = System.currentTimeMillis();
+        // Update fase berdasarkan ketersediaan amunisi
+        currentPhase = (ammo > 0) ? GamePhase.PLAYER_TURN : GamePhase.HIDING;
+
+        // Alien menyerang jika player terlihat (tidak sembunyi di balik batu)
+        if (!isPlayerHidden()) {
+            for (Alien a : aliens) {
+                // Alien hanya menembak jika player berada dalam jangkauan pandangan (X sejajar)
+                if (player.getX() >= a.getX() - 15 && player.getX() <= a.getX() + 35) {
+                    if (Math.random() < 0.05) {
+                        enemyBullets.add(new Bullet(a.getX() + 15, a.getY() + 30, 15, true));
+                    }
+                }
             }
         }
+
+        updateEnemyBullets();
+        updatePlayerBullets();
+
+        // Cek apakah semua musuh sudah musnah
+        if (aliens.isEmpty() && !victory) {
+            victory = true;
+            saveFinalData();
+        }
+
         view.repaint();
     }
 
+    public String getStatusMessage() {
+        if (gameOver) return "MISI GAGAL!";
+        if (victory) return "MISI BERHASIL!";
+        return (currentPhase == GamePhase.HIDING) ? "CARI PERSEMBUNYIAN!" : "SERANG ALIEN!";
+    }
+
+    public boolean isPlayerHidden() {
+        for (Rock r : rocks) {
+            if (player.getBounds().intersects(r.getBounds())) return true;
+        }
+        return false;
+    }
+
     private void handleInput() {
-        // Player bisa jalan kiri, kanan, bawah, dan atas
+        // Pergerakan Player
         if (view.getKeyHandler().up) player.move(0, -5);
         if (view.getKeyHandler().down) player.move(0, 5);
         if (view.getKeyHandler().left) player.move(-5, 0);
         if (view.getKeyHandler().right) player.move(5, 0);
 
-        // Menembak mengurangi jumlah amunisi
-        if (currentPhase == GamePhase.PLAYER_TURN && view.getKeyHandler().pause && ammo > 0) {
-            playerBullets.add(new Bullet(player.getX() + 17, player.getY(), 10, false));
+        // Menembak (Hanya bisa jika di fase Player Turn dan menekan spasi sekali)
+        if (currentPhase == GamePhase.PLAYER_TURN && view.getKeyHandler().isShooting && ammo > 0) {
+            playerBullets.add(new Bullet(player.getX() + 17, player.getY(), -10, false));
             ammo--;
+            view.getKeyHandler().isShooting = false; // Reset trigger spasi
         }
     }
 
@@ -88,54 +122,48 @@ public class GamePresenter {
         while (it.hasNext()) {
             Bullet b = it.next();
             b.update();
+
+            // Player tertabrak peluru alien
             if (b.getBounds().intersects(player.getBounds())) {
-                endGame();
+                gameOver = true;
+                saveFinalData();
+                return;
             }
+
+            // Amunisi bertambah jika peluru alien meleset/keluar layar
             if (!b.isActive()) {
-                missedBullets++; // Peluru alien meleset
-                ammo++;          // Peluru bertambah sesuai yang meleset
+                missedBullets++;
+                ammo++;
                 it.remove();
             }
         }
     }
 
     private void updatePlayerBullets() {
-        Iterator<Bullet> it = playerBullets.iterator();
-        while (it.hasNext()) {
-            Bullet b = it.next();
+        Iterator<Bullet> itBullet = playerBullets.iterator();
+        while (itBullet.hasNext()) {
+            Bullet b = itBullet.next();
             b.update();
-            for (Alien a : aliens) {
+
+            Iterator<Alien> itAlien = aliens.iterator();
+            while (itAlien.hasNext()) {
+                Alien a = itAlien.next();
                 if (b.getBounds().intersects(a.getBounds())) {
-                    score += 10; // Alien tertembak menambah skor
-                    a.setX(rand.nextInt(750));
+                    score += 10;
+                    itAlien.remove(); // Alien hancur dan dihapus dari list
                     b.setInactive();
                 }
             }
-            if (!b.isActive()) it.remove();
+            if (!b.isActive()) itBullet.remove();
         }
     }
 
-    private void endGame() {
-        if (!gameOver) {
-            gameOver = true;
-            new BenefitDAO().updateScore(this.currentUsername, this.score, this.missedBullets, this.ammo);
-        }
+    private void saveFinalData() {
+        new BenefitDAO().updateScore(currentUsername, score, missedBullets, ammo);
     }
 
-    public void resetGame() {
-        this.score = 0;
-        this.missedBullets = 0;
-        this.ammo = 0;
-        this.gameOver = false;
-        this.currentPhase = GamePhase.HIDING;
-        this.phaseStartTime = System.currentTimeMillis();
-    }
-
-    public String getStatusMessage() {
-        return (currentPhase == GamePhase.HIDING) ? "CARI PERSEMBUNYIAN!" : "SERANG ALIEN!";
-    }
-
-    // Getters...
+    public void resetGame() { if (loop != null) loop.stop(); }
+    public List<Rock> getRocks() { return rocks; }
     public Player getPlayer() { return player; }
     public List<Alien> getAliens() { return aliens; }
     public List<Bullet> getPlayerBullets() { return playerBullets; }
@@ -143,4 +171,5 @@ public class GamePresenter {
     public int getScore() { return score; }
     public int getAmmo() { return ammo; }
     public boolean isGameOver() { return gameOver; }
+    public boolean isVictory() { return victory; }
 }

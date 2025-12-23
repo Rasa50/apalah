@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 public class Bullet {
     private int x, y;
     private int speed;
-    private int width = 8, height = 8; // Peluru alien dibuat bulat kecil
+    private int width = 8, height = 8;
     private boolean active = true;
     private boolean isEnemy;
 
@@ -17,8 +17,9 @@ public class Bullet {
     }
 
     public void update() {
-        y += speed; // Selalu turun karena hanya alien yang menembak
-        if (y > 600) active = false;
+        y += speed;
+        // Perbaikan: Peluru mati jika keluar batas bawah (600) atau batas atas (-10)
+        if (y > 600 || y < -10) active = false;
     }
 
     public Rectangle getBounds() {

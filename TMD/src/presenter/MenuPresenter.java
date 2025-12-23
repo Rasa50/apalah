@@ -3,6 +3,7 @@ package presenter;
 import model.BenefitDAO;
 import view.MenuView;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.SwingUtilities;
 import java.util.List;
 import model.Benefit;
 
@@ -21,13 +22,15 @@ public class MenuPresenter {
         for (Benefit b : list) {
             model.addRow(new Object[]{b.getUsername(), b.getSkor(), b.getPeluruMeleset(), b.getPeluruAkhir()});
         }
-        view.setTableModel(model);
+        // Perbaikan: Update UI di dalam Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> {
+            view.setTableModel(model);
+        });
     }
 
     public void onPlayClicked() {
         String user = view.getUsername();
         if (!user.isEmpty()) {
-            // Beritahu Frame nama siapa yang bermain
             view.getMainFrame().setPlayerName(user);
             dao.upsertUser(user);
             view.startGame();

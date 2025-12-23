@@ -4,7 +4,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class KeyHandler extends KeyAdapter {
-    public boolean up, down, left, right, pause, esc; // Tambahkan esc
+    public boolean up, down, left, right, pause, esc;
+    // Variabel baru untuk mendeteksi trigger tembakan satu kali
+    public boolean isShooting;
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -13,8 +15,14 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) down = true;
         if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) left = true;
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = true;
-        if (code == KeyEvent.VK_SPACE) pause = true;
-        if (code == KeyEvent.VK_ESCAPE) esc = true; // Daftarkan ESC
+
+        if (code == KeyEvent.VK_SPACE) {
+            // Jika sebelumnya tombol tidak ditekan, set isShooting jadi true
+            if (!pause) isShooting = true;
+            pause = true;
+        }
+
+        if (code == KeyEvent.VK_ESCAPE) esc = true;
     }
 
     @Override
@@ -24,7 +32,12 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_DOWN || code == KeyEvent.VK_S) down = false;
         if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) left = false;
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = false;
-        if (code == KeyEvent.VK_SPACE) pause = false;
-        if (code == KeyEvent.VK_ESCAPE) esc = false; // Lepaskan ESC
+
+        if (code == KeyEvent.VK_SPACE) {
+            pause = false;
+            isShooting = false; // Reset saat tombol dilepas
+        }
+
+        if (code == KeyEvent.VK_ESCAPE) esc = false;
     }
 }

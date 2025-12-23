@@ -4,10 +4,15 @@ import presenter.GamePresenter;
 
 public class GameLoop implements Runnable {
     private GamePresenter presenter;
-    private boolean running = true;
+    private volatile boolean running = true; // Gunakan volatile agar sinkron antar thread
 
     public GameLoop(GamePresenter presenter) {
         this.presenter = presenter;
+    }
+
+    // Method baru untuk mematikan thread
+    public void stop() {
+        this.running = false;
     }
 
     @Override
@@ -15,9 +20,9 @@ public class GameLoop implements Runnable {
         while (running) {
             presenter.update();
             try {
-                Thread.sleep(16); // Target ~60 FPS
+                Thread.sleep(16);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
