@@ -4,8 +4,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class KeyHandler extends KeyAdapter {
-    public boolean up, down, left, right, pause, esc;
-    // Variabel baru untuk mendeteksi trigger tembakan satu kali
+    // Tambahkan variabel 'space' di sini
+    public boolean up, down, left, right, pause, esc, space;
     public boolean isShooting;
 
     @Override
@@ -17,7 +17,7 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = true;
 
         if (code == KeyEvent.VK_SPACE) {
-            // Jika sebelumnya tombol tidak ditekan, set isShooting jadi true
+            space = true; // Set true agar bisa dideteksi oleh GamePresenter
             if (!pause) isShooting = true;
             pause = true;
         }
@@ -34,8 +34,9 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = false;
 
         if (code == KeyEvent.VK_SPACE) {
+            space = false; // Reset saat tombol dilepas
             pause = false;
-            isShooting = false; // Reset saat tombol dilepas
+            isShooting = false;
         }
 
         if (code == KeyEvent.VK_ESCAPE) esc = false;

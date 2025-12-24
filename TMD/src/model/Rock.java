@@ -3,7 +3,7 @@ package model;
 import java.awt.Rectangle;
 
 public class Rock {
-    private int x, y, width = 80, height = 50;
+    private int x, y, width = 150, height = 150;
 
     public Rock(int x, int y) {
         this.x = x;

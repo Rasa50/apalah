@@ -1,6 +1,6 @@
 package view;
 
-import util.KeyHandler; // Tambahkan import ini
+import util.KeyHandler;
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,16 +8,20 @@ public class MainFrame extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private GameView gameView;
-    private KeyHandler keyHandler; // Tambahkan ini
+    private KeyHandler keyHandler;
     private String playerName;
 
     public MainFrame() {
         setTitle("Hide and Seek: The Challenge");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+
+        // --- KEMBALI KE AWAL: Ukuran statis 800x600 ---
+        setSize(820, 800);
+
+        // Memastikan jendela muncul di tengah layar
         setLocationRelativeTo(null);
 
-        // Inisialisasi KeyHandler di sini agar bisa dipakai bersama
+        // Inisialisasi KeyHandler agar bisa dipakai bersama
         this.keyHandler = new KeyHandler();
 
         cardLayout = new CardLayout();
@@ -33,7 +37,6 @@ public class MainFrame extends JFrame {
         cardLayout.show(mainPanel, "MENU");
     }
 
-    // Method Getter yang dicari oleh GameView
     public KeyHandler getKeyHandler() {
         return this.keyHandler;
     }

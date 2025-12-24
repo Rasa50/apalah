@@ -22,18 +22,19 @@ public class MenuPresenter {
         for (Benefit b : list) {
             model.addRow(new Object[]{b.getUsername(), b.getSkor(), b.getPeluruMeleset(), b.getPeluruAkhir()});
         }
-        // Perbaikan: Update UI di dalam Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
             view.setTableModel(model);
         });
     }
 
     public void onPlayClicked() {
-        String user = view.getUsername();
+        String user = view.getUsername(); // Sekarang method ini sudah ada di MenuView
         if (!user.isEmpty()) {
             view.getMainFrame().setPlayerName(user);
-            dao.upsertUser(user);
+            dao.upsertUser(user); // Memastikan user terdaftar di DB
             view.startGame();
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(view, "Pilot name is required!");
         }
     }
 }

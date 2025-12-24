@@ -70,7 +70,10 @@ public class GameView extends JPanel {
 
     private void drawGame(Graphics2D g) {
         // --- 1. Gambar Gameplay (Tetap terlihat di belakang saat pause) ---
-        if (imgBg != null) g.drawImage(imgBg, 0, 0, getWidth(), getHeight(), null);
+
+        if (imgBg != null) {
+            g.drawImage(imgBg, 0, 0, getWidth(), getHeight(), null);
+        }
 
         for (Rock r : presenter.getRocks()) {
             if (imgRock != null) g.drawImage(imgRock, r.getX(), r.getY(), 150, 150, null);
