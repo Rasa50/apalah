@@ -1,8 +1,10 @@
 package view;
 
 import util.KeyHandler;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.CardLayout;
 
 public class MainFrame extends JFrame {
     private CardLayout cardLayout;

@@ -1,10 +1,27 @@
 package view;
 
 import presenter.MenuPresenter;
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.BorderFactory;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 public class MenuView extends JPanel {
     private JTextField txtUsername;

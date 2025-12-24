@@ -1,9 +1,18 @@
 package presenter;
 
 import view.GameView;
-import model.*;
+import model.Player;
+import model.Alien;
+import model.Rock;
+import model.Bullet;
+import model.Benefit;
+import model.BenefitDAO;
 import util.GameLoop;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Random;
 
 public class GamePresenter {
     private GameView view;
