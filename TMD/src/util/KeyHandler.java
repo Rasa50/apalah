@@ -4,8 +4,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class KeyHandler extends KeyAdapter {
-    // Tambahkan variabel 'space' di sini
-    public boolean up, down, left, right, pause, esc, space;
+    public boolean up, down, left, right, pause, esc, space, shift;
     public boolean isShooting;
 
     @Override
@@ -16,10 +15,11 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) left = true;
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = true;
 
-        if (code == KeyEvent.VK_SPACE) {
-            space = true; // Set true agar bisa dideteksi oleh GamePresenter
-            if (!pause) isShooting = true;
-            pause = true;
+        if (code == KeyEvent.VK_SPACE) space = true; // Deteksi Space
+
+        if (code == KeyEvent.VK_SHIFT) {
+            if (!isShooting) isShooting = true;
+            shift = true;
         }
 
         if (code == KeyEvent.VK_ESCAPE) esc = true;
@@ -33,12 +33,18 @@ public class KeyHandler extends KeyAdapter {
         if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_A) left = false;
         if (code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_D) right = false;
 
-        if (code == KeyEvent.VK_SPACE) {
-            space = false; // Reset saat tombol dilepas
-            pause = false;
+        if (code == KeyEvent.VK_SPACE) space = false;
+
+        if (code == KeyEvent.VK_SHIFT) {
+            shift = false;
             isShooting = false;
         }
 
         if (code == KeyEvent.VK_ESCAPE) esc = false;
+    }
+
+    public void resetKeys() {
+        up = down = left = right = space = shift = pause = esc = false;
+        isShooting = false;
     }
 }

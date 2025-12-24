@@ -14,16 +14,10 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Hide and Seek: The Challenge");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // --- KEMBALI KE AWAL: Ukuran statis 800x600 ---
-        setSize(820, 800);
-
-        // Memastikan jendela muncul di tengah layar
+        setSize(820, 650);
         setLocationRelativeTo(null);
 
-        // Inisialisasi KeyHandler agar bisa dipakai bersama
         this.keyHandler = new KeyHandler();
-
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 

@@ -15,8 +15,6 @@ public class GameView extends JPanel {
     private GamePresenter presenter;
     private MainFrame frame;
     private BufferedImage imgBg, imgPlayer, imgAlien, imgRock, imgBullet;
-
-    // Area tombol interaktif
     private Rectangle btnBackBounds;
 
     public GameView(MainFrame frame) {
@@ -26,14 +24,10 @@ public class GameView extends JPanel {
         setBackground(new Color(10, 10, 40));
         addKeyListener(frame.getKeyHandler());
 
-        // Posisi tombol di tengah layar (x, y, width, height)
         btnBackBounds = new Rectangle(300, 380, 200, 50);
-
-        // Listener Klik Mouse untuk Tombol
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Tombol hanya berfungsi jika game sudah selesai (Kalah atau Menang)
                 if (presenter != null && (presenter.isGameOver() || presenter.isVictory())) {
                     if (btnBackBounds.contains(e.getPoint())) {
                         backToMenu();
@@ -69,8 +63,6 @@ public class GameView extends JPanel {
     }
 
     private void drawGame(Graphics2D g) {
-        // --- 1. Gambar Gameplay (Tetap terlihat di belakang saat pause) ---
-
         if (imgBg != null) {
             g.drawImage(imgBg, 0, 0, getWidth(), getHeight(), null);
         }
@@ -80,9 +72,13 @@ public class GameView extends JPanel {
         }
 
         Player p = presenter.getPlayer();
-        if (presenter.isPlayerHidden()) ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        if (presenter.isPlayerHidden()) {
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        }
+
         if (imgPlayer != null) g.drawImage(imgPlayer, p.getX(), p.getY(), p.getWidth(), p.getHeight(), null);
-        ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
         for (Alien a : presenter.getAliens()) {
             if (imgAlien != null) g.drawImage(imgAlien, a.getX(), a.getY(), 50, 50, null);
@@ -95,17 +91,12 @@ public class GameView extends JPanel {
             if (imgBullet != null) g.drawImage(imgBullet, b.getX(), b.getY(), 30, 30, null);
         }
 
-        // --- 2. HUD Atas ---
         drawHUD(g);
 
-        // --- 3. LAYAR JEDA AKHIR (Pause Screen) ---
-        // Jika Kalah
         if (presenter.isGameOver()) {
-            drawEndScreen(g, "MISSION FAILED", new Color(255, 50, 50));
-        }
-        // Jika Menang
-        else if (presenter.isVictory()) {
-            drawEndScreen(g, "MISSION SUCCESS!", new Color(50, 255, 50));
+            drawEndScreen(g, presenter.getStatusMessage(), new Color(255, 50, 50));
+        } else if (presenter.isVictory()) {
+            drawEndScreen(g, presenter.getStatusMessage(), new Color(50, 255, 50));
         }
     }
 
@@ -123,44 +114,41 @@ public class GameView extends JPanel {
     }
 
     private void drawEndScreen(Graphics g, String message, Color titleColor) {
-        // Overlay Gelap (Membuat efek game berhenti/pause)
         g.setColor(new Color(0, 0, 0, 210));
         g.fillRect(0, 0, getWidth(), getHeight());
-
-        // Pesan Utama (FAILED / SUCCESS)
         g.setColor(titleColor);
         g.setFont(new Font("Arial", Font.BOLD, 55));
-        int msgX = (getWidth() - g.getFontMetrics().stringWidth(message)) / 2;
-        g.drawString(message, msgX, 280);
 
-        // Informasi Skor Akhir
+        int msgX = (getWidth() - g.getFontMetrics().stringWidth(message)) / 2;
+
+        g.drawString(message, msgX, 280);
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.PLAIN, 22));
-        String scoreTxt = "Skor Akhir: " + presenter.getScore();
-        g.drawString(scoreTxt, (getWidth() - g.getFontMetrics().stringWidth(scoreTxt)) / 2, 330);
 
-        // --- Gambar Tombol BACK TO MENU ---
-        // Background Tombol
+        String scoreTxt = "Skor Akhir: " + presenter.getScore();
+
+        g.drawString(scoreTxt, (getWidth() - g.getFontMetrics().stringWidth(scoreTxt)) / 2, 330);
         g.setColor(new Color(255, 255, 255, 40));
         g.fillRect(btnBackBounds.x, btnBackBounds.y, btnBackBounds.width, btnBackBounds.height);
-        // Border Tombol
         g.setColor(Color.WHITE);
         g.drawRect(btnBackBounds.x, btnBackBounds.y, btnBackBounds.width, btnBackBounds.height);
-
-        // Teks Tombol
         g.setFont(new Font("Arial", Font.BOLD, 18));
+
         String btnText = "BACK TO MENU";
         int tx = btnBackBounds.x + (btnBackBounds.width - g.getFontMetrics().stringWidth(btnText)) / 2;
         int ty = btnBackBounds.y + 32;
-        g.drawString(btnText, tx, ty);
 
-        // Petunjuk Keyboard
+        g.drawString(btnText, tx, ty);
         g.setFont(new Font("Arial", Font.ITALIC, 13));
-        g.drawString("Atau tekan ESC pada keyboard", (getWidth() - g.getFontMetrics().stringWidth("Atau tekan ESC pada keyboard")) / 2, 460);
+
+        String hint = "Atau tekan ESC pada keyboard";
+
+        g.drawString(hint, (getWidth() - g.getFontMetrics().stringWidth(hint)) / 2, 460);
     }
 
     public void backToMenu() {
-        if (presenter != null) presenter.resetGame();
+        if (presenter != null) presenter.resetGame(); // Hentikan loop game
+        getKeyHandler().resetKeys(); // Reset status tombol agar menu tidak macet
         frame.showView("MENU");
     }
 

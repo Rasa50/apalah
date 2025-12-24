@@ -4,13 +4,12 @@ import presenter.GamePresenter;
 
 public class GameLoop implements Runnable {
     private GamePresenter presenter;
-    private volatile boolean running = true; // Gunakan volatile agar sinkron antar thread
+    private volatile boolean running = true;
 
     public GameLoop(GamePresenter presenter) {
         this.presenter = presenter;
     }
 
-    // Method baru untuk mematikan thread
     public void stop() {
         this.running = false;
     }

@@ -4,22 +4,23 @@ import java.awt.Rectangle;
 
 public class Bullet {
     private int x, y;
-    private int speed;
+    private double speedX, speedY;
     private int width = 8, height = 8;
     private boolean active = true;
     private boolean isEnemy;
 
-    public Bullet(int x, int y, int speed, boolean isEnemy) {
+    public Bullet(int x, int y, double speedX, double speedY, boolean isEnemy) {
         this.x = x;
         this.y = y;
-        this.speed = speed;
+        this.speedX = speedX;
+        this.speedY = speedY;
         this.isEnemy = isEnemy;
     }
 
     public void update() {
-        y += speed;
-        // Perbaikan: Peluru mati jika keluar batas bawah (600) atau batas atas (-10)
-        if (y > 600 || y < -10) active = false;
+        x += speedX;
+        y += speedY;
+        if (y > 600 || y < -10 || x < -10 || x > 810) active = false;
     }
 
     public Rectangle getBounds() {

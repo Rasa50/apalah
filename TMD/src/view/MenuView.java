@@ -4,11 +4,10 @@ import presenter.MenuPresenter;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class MenuView extends JPanel {
-    private JTextField txtUsername; // Pastikan nama variabel konsisten
+    private JTextField txtUsername;
     private JButton btnPlay;
     private JTable tableScores;
     private DefaultTableModel tableModel;
@@ -17,12 +16,11 @@ public class MenuView extends JPanel {
 
     public MenuView(MainFrame frame) {
         this.frame = frame;
-        this.presenter = new MenuPresenter(this); // Inisialisasi presenter
+        this.presenter = new MenuPresenter(this);
 
         setLayout(new BorderLayout());
-        setBackground(new Color(10, 10, 25)); // Dark Space Background
+        setBackground(new Color(10, 10, 25));
 
-        // --- Panel Utama dengan Efek Grid Neon ---
         JPanel mainContainer = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -30,12 +28,10 @@ public class MenuView extends JPanel {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Menggambar Subtle Neon Grid
                 g2.setColor(new Color(0, 255, 255, 30));
                 for (int i = 0; i < getWidth(); i += 40) g2.drawLine(i, 0, i, getHeight());
                 for (int i = 0; i < getHeight(); i += 40) g2.drawLine(0, i, getWidth(), i);
 
-                // Menggambar Neon Glow Border
                 g2.setColor(new Color(0, 200, 255, 100));
                 g2.setStroke(new BasicStroke(3));
                 g2.drawRoundRect(20, 20, getWidth() - 40, getHeight() - 40, 30, 30);
@@ -45,14 +41,12 @@ public class MenuView extends JPanel {
         mainContainer.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // TITLE
         JLabel titleLabel = new JLabel("SPACE DEFENDER");
         titleLabel.setFont(new Font("Monospaced", Font.BOLD, 36));
         titleLabel.setForeground(new Color(0, 255, 255));
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; gbc.insets = new Insets(0, 0, 30, 0);
         mainContainer.add(titleLabel, gbc);
 
-        // INPUT SECTION
         JPanel inputPanel = new JPanel(new FlowLayout());
         inputPanel.setOpaque(false);
 
@@ -72,7 +66,6 @@ public class MenuView extends JPanel {
         gbc.gridy = 1; gbc.insets = new Insets(0, 0, 20, 0);
         mainContainer.add(inputPanel, gbc);
 
-        // LEADERBOARD TABLE
         tableScores = new JTable();
         tableScores.setRowHeight(30);
         tableScores.setBackground(new Color(15, 15, 40));
@@ -89,7 +82,6 @@ public class MenuView extends JPanel {
         gbc.gridy = 2;
         mainContainer.add(scrollPane, gbc);
 
-        // PLAY BUTTON
         btnPlay = new JButton("INIT MISSION");
         btnPlay.setFont(new Font("Monospaced", Font.BOLD, 22));
         btnPlay.setBackground(new Color(0, 150, 150));
@@ -109,7 +101,6 @@ public class MenuView extends JPanel {
         presenter.loadData();
     }
 
-    // METHOD PENTING: Untuk memperbaiki error di MainFrame
     public MenuPresenter getPresenter() {
         return presenter;
     }
@@ -118,7 +109,6 @@ public class MenuView extends JPanel {
         tableScores.setAutoCreateColumnsFromModel(true);
         tableScores.setModel(model);
 
-        // Perataan tengah teks tabel
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < tableScores.getColumnCount(); i++) {

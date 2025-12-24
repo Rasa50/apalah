@@ -1,4 +1,3 @@
-// src/model/Alien.java
 package model;
 
 import java.awt.Rectangle;
@@ -15,7 +14,6 @@ public class Alien {
     }
 
     public void update() {
-        // Contoh: Alien bergerak kanan-kiri di posisi bawah
         x += (speed * direction);
         if (x > 750 || x < 10) direction *= -1;
     }

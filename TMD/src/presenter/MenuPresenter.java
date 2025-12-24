@@ -28,10 +28,10 @@ public class MenuPresenter {
     }
 
     public void onPlayClicked() {
-        String user = view.getUsername(); // Sekarang method ini sudah ada di MenuView
+        String user = view.getUsername();
         if (!user.isEmpty()) {
             view.getMainFrame().setPlayerName(user);
-            dao.upsertUser(user); // Memastikan user terdaftar di DB
+            dao.upsertUser(user);
             view.startGame();
         } else {
             javax.swing.JOptionPane.showMessageDialog(view, "Pilot name is required!");
